@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <button class="save-btn" type="button" @click="$emit('save')">保存</button>
+        <button class="btn btn-primary" type="button" @click="$emit('save')">保存</button>
         <div
           class="shortcut-hint"
           title="快捷键 Ctrl / Command + Enter"
