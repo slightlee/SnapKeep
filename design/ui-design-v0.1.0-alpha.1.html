@@ -1,0 +1,2621 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapKeep v0.1.0-alpha.1 — UI 设计稿</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap');
+
+    /* ========== Design Tokens ========== */
+    :root {
+      --bg-primary: #F6F7FB;
+      --bg-secondary: #EEF1F7;
+      --bg-tertiary: #E6EBF4;
+      --bg-input: #F8F9FD;
+      --bg-card: #FFFFFF;
+      --bg-overlay: rgba(19, 22, 33, 0.45);
+      --bg-hover: #F2F5FB;
+      --bg-tag: #F1F3F8;
+      --bg-toast-success: #ECFDF5;
+      --bg-toast-error: #FEF2F2;
+      --bg-badge: #FFE7C2;
+
+      --text-primary: #2A2F3A;
+      --text-secondary: #616A82;
+      --text-tertiary: #8C95AD;
+      --text-inverse: #FFFFFF;
+      --text-tag: #5B6B86;
+      --text-badge: #8A4B12;
+      --text-toast-success: #065F46;
+      --text-toast-error: #991B1B;
+
+      --border-primary: #E2E7F1;
+      --border-focus: #4C6FFF;
+      --border-input: rgba(76, 111, 255, 0.18);
+      --border-input-strong: rgba(76, 111, 255, 0.35);
+      --border-tag: #E0E6F2;
+      --border-toast-success: #A7F3D0;
+      --border-toast-error: #FECACA;
+
+      --accent: #5B73E6;
+      --accent-hover: #4D64D6;
+      --accent-light: rgba(91, 115, 230, 0.16);
+      --danger: #DC2626;
+      --danger-hover: #B91C1C;
+      --danger-light: #FEF2F2;
+
+      --shadow-sm: 0 6px 16px rgba(32, 42, 74, 0.08);
+      --shadow-md: 0 14px 34px rgba(32, 42, 74, 0.12);
+      --shadow-lg: 0 28px 60px rgba(32, 42, 74, 0.16);
+      --shadow-card: 0 12px 30px rgba(31, 39, 63, 0.08), 0 2px 6px rgba(31, 39, 63, 0.06);
+
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+
+      --font-sans: "Plus Jakarta Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-display: "ZCOOL XiaoWei", "STKaiti", serif;
+      --font-size-xs: 12px;
+      --font-size-sm: 13px;
+      --font-size-md: 14px;
+      --font-size-lg: 15px;
+      --font-size-xl: 16px;
+      --font-size-2xl: 18px;
+      --line-height-tight: 1.4;
+      --line-height-base: 1.6;
+
+      --header-h: 56px;
+      --max-w: 1100px;
+      --drawer-w: 420px;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0F1320;
+      --bg-secondary: #151A2A;
+      --bg-tertiary: #1D2438;
+      --bg-input: #1A2033;
+      --bg-card: #141A2A;
+      --bg-overlay: rgba(0, 0, 0, 0.65);
+      --bg-hover: #1E2740;
+      --bg-tag: rgba(115, 128, 170, 0.18);
+      --bg-toast-success: rgba(6, 95, 70, 0.2);
+      --bg-toast-error: rgba(153, 27, 27, 0.2);
+      --bg-badge: rgba(255, 231, 194, 0.14);
+
+      --text-primary: #E6E9F6;
+      --text-secondary: #A3ACC4;
+      --text-tertiary: #76809A;
+      --text-inverse: #FFFFFF;
+      --text-tag: #B3BED8;
+      --text-badge: #FFD9A3;
+      --text-toast-success: #6EE7B7;
+      --text-toast-error: #FCA5A5;
+
+      --border-primary: #262E46;
+      --border-focus: #6A8BFF;
+      --border-input: rgba(106, 139, 255, 0.28);
+      --border-input-strong: rgba(106, 139, 255, 0.5);
+      --border-tag: rgba(145, 158, 196, 0.32);
+      --border-toast-success: rgba(110, 231, 183, 0.3);
+      --border-toast-error: rgba(252, 165, 165, 0.3);
+
+      --accent: #7A8FF2;
+      --accent-hover: #8EA2FF;
+      --accent-light: rgba(122, 143, 242, 0.2);
+
+      --shadow-sm: 0 6px 16px rgba(5, 8, 16, 0.4);
+      --shadow-md: 0 14px 34px rgba(5, 8, 16, 0.5);
+      --shadow-lg: 0 30px 70px rgba(5, 8, 16, 0.55);
+      --shadow-card: 0 12px 30px rgba(5, 8, 16, 0.45), 0 2px 6px rgba(5, 8, 16, 0.35);
+    }
+
+    /* ========== Reset ========== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: radial-gradient(1200px 500px at 10% -10%, #FFFFFF 0%, #F6F7FB 45%, #EEF1F7 100%);
+      color: var(--text-primary);
+      line-height: var(--line-height-base);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(600px 260px at 85% 8%, rgba(76, 111, 255, 0.18), transparent 55%),
+        radial-gradient(500px 220px at 5% 65%, rgba(255, 231, 194, 0.4), transparent 60%);
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.25;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    [data-theme="dark"] body {
+      background: radial-gradient(1200px 500px at 10% -10%, #1A2033 0%, #0F1320 55%, #0B0F1A 100%);
+    }
+
+    [data-theme="dark"] body::before {
+      background:
+        radial-gradient(600px 260px at 85% 8%, rgba(106, 139, 255, 0.18), transparent 55%),
+        radial-gradient(520px 240px at 12% 70%, rgba(255, 208, 138, 0.08), transparent 60%);
+      opacity: 0.9;
+    }
+
+    [data-theme="dark"] body::after {
+      opacity: 0.16;
+      mix-blend-mode: normal;
+    }
+
+    input,
+    textarea,
+    button {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ========== Spec Banner ========== */
+    .spec-banner {
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 8px;
+      z-index: 1000;
+      margin: 12px auto 0;
+      max-width: var(--max-w);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(16px);
+    }
+
+    [data-theme="dark"] .spec-banner {
+      background: rgba(17, 23, 38, 0.82);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .spec-nav {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .spec-nav button {
+      background: rgba(76, 111, 255, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(76, 111, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .spec-nav button:hover,
+    .spec-nav button.active {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .spec-nav button {
+      background: rgba(106, 139, 255, 0.16);
+      color: #AFC0FF;
+      border: 1px solid rgba(106, 139, 255, 0.3);
+    }
+
+    /* ========== Header ========== */
+    .header {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      height: var(--header-h);
+      padding: 0 16px;
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .header-inner {
+      height: 100%;
+      max-width: var(--max-w);
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(16px);
+    }
+
+    [data-theme="dark"] .header-inner {
+      background: rgba(20, 26, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .header-logo {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .header-logo span {
+      font-family: var(--font-display);
+      letter-spacing: 0.4px;
+    }
+
+    .header-logo svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .header-logo .logo-img {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      object-fit: cover;
+      box-shadow: 0 4px 10px rgba(76, 111, 255, 0.2);
+    }
+
+    .header-logo .logo-emoji {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--bg-badge);
+      color: var(--text-badge);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .header-search {
+      width: clamp(240px, 28vw, 480px);
+      position: relative;
+    }
+
+    .header-search input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-pill);
+      padding: 0 40px 0 38px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: var(--font-size-md);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+
+    .header-search input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .header-search input:focus {
+      border-color: var(--border-input-strong);
+      background: var(--bg-input);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .header-search .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+
+    .search-count {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-tag);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-pill);
+      color: var(--text-secondary);
+      transition: background var(--transition), color var(--transition), transform 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(76, 111, 255, 0.12);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .icon-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    /* ========== Theme Menu ========== */
+    .theme-switch {
+      position: relative;
+    }
+
+    .theme-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 176px;
+      padding: 8px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(12px);
+      z-index: 120;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px);
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    }
+
+    [data-theme="dark"] .theme-menu {
+      background: rgba(20, 26, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .theme-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .theme-menu button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+    }
+
+    .theme-menu button:hover {
+      background: var(--bg-hover);
+    }
+
+    .theme-menu button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .theme-menu .item-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .theme-menu .item-left svg {
+      width: 16px;
+      height: 16px;
+      color: var(--text-secondary);
+    }
+
+    .theme-menu .item-title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+    }
+
+    .theme-menu .item-desc {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .theme-menu .check {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--accent);
+      opacity: 0;
+    }
+
+    .theme-menu button.active .check {
+      opacity: 1;
+    }
+
+    /* ========== Main ========== */
+    .main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 36px 20px 90px;
+    }
+
+    /* ========== Input Section ========== */
+    .input-section {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F7F9FF 100%);
+      border: 1px solid rgba(227, 233, 246, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin: 0 auto 20px;
+      box-shadow: var(--shadow-card);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    [data-theme="dark"] .input-section {
+      background: linear-gradient(180deg, #151A2A 0%, #111626 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .input-section:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-md), 0 0 0 4px var(--accent-light);
+    }
+
+    .input-content {
+      width: 100%;
+      min-height: 84px;
+      border: none;
+      resize: vertical;
+      font-size: var(--font-size-md);
+      line-height: var(--line-height-base);
+      color: var(--text-primary);
+      background: transparent;
+      outline: none;
+      padding: 4px 2px;
+    }
+
+    .input-content::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .input-toolbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(226, 231, 241, 0.8);
+    }
+
+    [data-theme="dark"] .input-toolbar {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .input-footer {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .shortcut-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+
+    .shortcut-hint .keycap {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-primary);
+      font-weight: 600;
+      line-height: 1;
+      color: var(--text-secondary);
+    }
+
+    .tag-input-wrapper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      height: 34px;
+      border: 1px solid rgba(76, 111, 255, 0.12);
+      border-radius: var(--radius-pill);
+      padding: 0 12px;
+      background: #F4F7FF;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    [data-theme="dark"] .tag-input-wrapper {
+      background: #12182A;
+      border-color: rgba(106, 139, 255, 0.28);
+    }
+
+    .tag-input-wrapper .tag-icon {
+      color: var(--text-tertiary);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .tag-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      background: transparent;
+      min-width: 0;
+    }
+
+    .tag-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .tag-input-wrapper:focus-within {
+      border-color: var(--border-focus);
+      background: var(--bg-input);
+    }
+
+    .tag-area {
+      min-width: 0;
+    }
+
+    .tag-preview {
+      display: none;
+      margin-top: 8px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag-preview.show {
+      display: flex;
+    }
+
+    .tag.tag-preview-item {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+    }
+
+    .save-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 16px;
+      background: #007aff;
+      color: var(--text-inverse);
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      box-shadow: 0 10px 20px rgba(0, 122, 255, 0.28);
+      transition: background var(--transition), transform 0.1s, box-shadow 0.15s;
+      flex-shrink: 0;
+    }
+
+    .save-btn:hover {
+      background: #0066d6;
+      box-shadow: 0 12px 22px rgba(0, 102, 214, 0.3);
+    }
+
+    .save-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* ========== Card List ========== */
+    .card-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+      .card-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .card-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(227, 233, 246, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform 0.15s;
+      display: flex;
+      flex-direction: column;
+      height: 180px;
+      min-height: 180px;
+    }
+
+    [data-theme="dark"] .card {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .card:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-light);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      min-height: 36px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+      letter-spacing: 0.1px;
+      flex: 1;
+      min-width: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 2px;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .card:focus-within .card-actions {
+      opacity: 1;
+    }
+
+    .card-action-btn {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      color: var(--text-tertiary);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .card-action-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .card-action-btn.danger:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .card-action-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .card-action-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .card-body {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+      line-height: 20px;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 60px;
+      max-height: 60px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: auto;
+      min-height: 24px;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .card-tags .tag {
+      max-width: 96px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      background: rgba(120, 130, 160, 0.12);
+      color: var(--text-tertiary);
+      border: 1px solid rgba(150, 160, 185, 0.28);
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .card-time {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ========== Empty State ========== */
+    .empty-state {
+      position: relative;
+      text-align: center;
+      padding: 28px 20px;
+      color: var(--text-tertiary);
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 28px auto 0;
+      border-radius: 22px;
+      border: 1px dashed rgba(203, 210, 228, 0.75);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .empty-state svg {
+      width: 46px;
+      height: 46px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+      display: inline-block;
+      padding: 8px;
+      border-radius: 16px;
+      background: #F1F4FF;
+      box-shadow: inset 0 0 0 1px rgba(76, 111, 255, 0.12);
+    }
+
+    .empty-state h3 {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-base);
+    }
+
+    .empty-state p {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    [data-theme="dark"] .empty-state {
+      background: transparent;
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: none;
+    }
+
+    [data-theme="dark"] .empty-state svg {
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    /* ========== Drawer ========== */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-overlay);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: var(--drawer-w);
+      height: 100%;
+      background: var(--bg-primary);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-primary);
+      flex-shrink: 0;
+    }
+
+    .drawer-header h2 {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: var(--bg-secondary);
+    }
+
+    .drawer-section {
+      margin-bottom: 14px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .drawer-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .drawer-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      letter-spacing: 0.2px;
+      margin-bottom: 12px;
+    }
+
+    .section-hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin: -6px 0 12px;
+      line-height: 1.6;
+    }
+
+    .preset-address {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px dashed var(--border-primary);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .preset-address code {
+      font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+      background: rgba(76, 111, 255, 0.1);
+      color: var(--text-primary);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+
+    [data-theme="dark"] .preset-address {
+      background: #12182A;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: var(--font-size-md);
+      outline: none;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .form-input:focus {
+      border-color: var(--border-focus);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .form-hint {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .hint-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-badge);
+      color: var(--text-badge);
+      border: 1px solid rgba(255, 188, 105, 0.45);
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper .form-input {
+      padding-right: 40px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-secondary);
+    }
+
+    .password-toggle svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .flex {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 600;
+      transition: background var(--transition), color var(--transition), opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #5A7BFF 0%, #3F5BFF 100%);
+      color: var(--text-inverse);
+      box-shadow: 0 10px 20px rgba(76, 111, 255, 0.28);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4C6FFF 0%, #2F4DFF 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--text-inverse);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-hover);
+    }
+
+    .btn-outline {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-primary);
+      border-color: var(--border-input-strong);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-sm {
+      height: 32px;
+      font-size: 13px;
+      padding: 0 12px;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .btn-outline .spinner {
+      border-color: rgba(79, 70, 229, 0.2);
+      border-top-color: var(--accent);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      transition: background var(--transition);
+    }
+
+    .stat-card .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .stat-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .info-text {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      line-height: 1.65;
+    }
+
+    .version-text {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .backup-file-list {
+      list-style: none;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .backup-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-primary);
+      font-size: 13px;
+      transition: background 0.1s;
+    }
+
+    .backup-file-item:last-child {
+      border-bottom: none;
+    }
+
+    .backup-file-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .backup-file-item .file-name {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .backup-file-item .file-date {
+      color: var(--text-tertiary);
+      font-size: 12px;
+    }
+
+    /* ========== Modal ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-overlay);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      width: 600px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition);
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .modal-body textarea {
+      width: 100%;
+      min-height: 180px;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      background: var(--bg-input);
+      outline: none;
+      resize: vertical;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .modal-body textarea:focus {
+      border-color: var(--border-focus);
+    }
+
+    .modal-body .form-group {
+      margin-top: 14px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-primary);
+    }
+
+    /* ========== Confirm Dialog ========== */
+    .confirm-dialog {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      width: 400px;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition);
+    }
+
+    .modal-overlay.open .confirm-dialog {
+      transform: scale(1);
+    }
+
+    .confirm-dialog .confirm-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-icon.danger {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .confirm-icon.warning {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    [data-theme="dark"] .confirm-icon.warning {
+      background: rgba(217, 119, 6, 0.15);
+    }
+
+    .confirm-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .confirm-dialog h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .confirm-dialog p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .confirm-dialog .btn-row {
+      justify-content: center;
+    }
+
+    /* ========== Toast ========== */
+    .toast-container {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      animation: toastIn 0.3s ease;
+      min-width: 240px;
+    }
+
+    .toast.success {
+      background: var(--bg-toast-success);
+      color: var(--text-toast-success);
+      border: 1px solid var(--border-toast-success);
+    }
+
+    .toast.error {
+      background: var(--bg-toast-error);
+      color: var(--text-toast-error);
+      border: 1px solid var(--border-toast-error);
+    }
+
+    .toast svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 0 14px;
+        gap: 8px;
+      }
+
+      .header-logo span:last-child {
+        display: none;
+      }
+
+      .header-right {
+        flex: 1;
+      }
+
+      .header-search {
+        width: auto;
+        flex: 1;
+      }
+
+      .main {
+        padding: 26px 14px 80px;
+      }
+
+      .input-section {
+        padding: 16px;
+      }
+
+      .input-content {
+        min-height: 90px;
+      }
+
+      .card {
+        padding: 14px 16px;
+        height: 160px;
+        min-height: 160px;
+      }
+
+      .card-actions {
+        opacity: 1;
+      }
+
+      .drawer {
+        width: 100%;
+      }
+
+      .modal {
+        width: calc(100% - 24px);
+        margin: 12px;
+        border-radius: var(--radius-md);
+      }
+
+      .confirm-dialog {
+        width: calc(100% - 32px);
+      }
+
+      .spec-banner {
+        font-size: 12px;
+      }
+
+      .toast-container {
+        right: 14px;
+        left: 14px;
+        top: 76px;
+      }
+
+      .toast {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .input-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar-right {
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .shortcut-hint {
+        display: none;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-primary);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== Spec Banner ===== -->
+  <div class="spec-banner">
+    SnapKeep v0.1.0-alpha.1 — UI 设计稿（可交互原型）
+    <div class="spec-nav">
+      <button class="active" onclick="showState('normal', event)">默认状态</button>
+      <button onclick="showState('empty', event)">空状态</button>
+      <button onclick="showState('search', event)">搜索状态</button>
+      <button onclick="showState('searchEmpty', event)">搜索无结果</button>
+      <button onclick="toggleDrawer()">设置面板</button>
+      <button onclick="toggleEditModal()">编辑弹窗</button>
+      <button onclick="showConfirm('delete')">删除确认</button>
+      <button onclick="showConfirm('import')">导入确认</button>
+      <button onclick="showConfirm('restore')">恢复确认</button>
+      <button onclick="showToast('success')">成功提示</button>
+      <button onclick="showToast('error')">失败提示</button>
+      <button onclick="toggleTheme()">切换主题</button>
+    </div>
+  </div>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+          <polyline points="13 2 13 9 20 9" />
+        </svg>
+        <span>SnapKeep</span>
+      </div>
+      <div class="header-right">
+        <div class="header-search">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input type="text" id="searchInput" placeholder="搜索记录内容或标签..." />
+          <span class="search-count" id="searchCount" style="display:none;">2 条匹配</span>
+        </div>
+        <div class="header-actions">
+          <div class="theme-switch">
+            <button class="icon-btn" type="button" onclick="toggleThemeMenu(event)" title="主题" aria-haspopup="menu"
+              aria-expanded="false" id="themeBtn">
+              <span class="sr-only">主题设置</span>
+              <svg id="themeSystem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+              <svg id="themeSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+              <svg id="themeMoon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            </button>
+            <div class="theme-menu" id="themeMenu" role="menu" aria-labelledby="themeBtn">
+              <button type="button" role="menuitemradio" onclick="setThemeMode('system')" id="themeItemSystem">
+                <span class="item-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                  <span>
+                    <div class="item-title">跟随系统</div>
+                    <div class="item-desc">默认推荐</div>
+                  </span>
+                </span>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
+              <button type="button" role="menuitemradio" onclick="setThemeMode('light')" id="themeItemLight">
+                <span class="item-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                  <span>
+                    <div class="item-title">亮色模式</div>
+                    <div class="item-desc">始终亮色</div>
+                  </span>
+                </span>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
+              <button type="button" role="menuitemradio" onclick="setThemeMode('dark')" id="themeItemDark">
+                <span class="item-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                  <span>
+                    <div class="item-title">暗色模式</div>
+                    <div class="item-desc">始终暗色</div>
+                  </span>
+                </span>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button class="icon-btn" type="button" onclick="toggleDrawer()" title="设置" aria-controls="drawer"
+            aria-expanded="false" id="settingsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="main">
+    <!-- Input Section -->
+    <section class="input-section">
+      <textarea class="input-content" placeholder="在此输入或粘贴内容...&#10;支持多行文本，系统将自动提取前 20 字作为标题"></textarea>
+      <div class="input-toolbar">
+        <div class="input-footer">
+          <div class="tag-area">
+            <div class="tag-input-wrapper">
+              <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+              <input class="tag-input" id="tagInputMain" type="text" placeholder="添加标签（空格/逗号均可）"
+                oninput="renderTagPreviewById('tagInputMain','tagPreviewMain')"
+                onblur="normalizeTagInputById('tagInputMain','tagPreviewMain')" />
+            </div>
+            <div class="tag-preview" id="tagPreviewMain" aria-label="标签预览"></div>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button class="save-btn" type="button">保存</button>
+          <div class="shortcut-hint" title="快捷键 Ctrl / Command + Enter" aria-label="快捷键 Ctrl / Command + Enter">
+            <span class="keycap">Ctrl</span>
+            <span class="keycap">/</span>
+            <span class="keycap">&#8984;</span>
+            <span class="keycap">Enter</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card List -->
+    <div class="card-list" id="cardList">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Vue 3 Composition API 响应式原理笔记</div>
+          <div class="card-actions">
+            <button class="card-action-btn" title="复制内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg></button>
+            <button class="card-action-btn" title="编辑" onclick="toggleEditModal()"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></button>
+            <button class="card-action-btn danger" title="删除" onclick="showConfirm('delete')"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg></button>
+          </div>
+        </div>
+        <div class="card-body">Vue 3 的 reactive() 使用 Proxy 实现深层响应式追踪，ref() 则通过 getter/setter 包装基本类型。在 setup
+          函数中，watchEffect 会自动收集依赖并在变化时重新执行回调。computed 属性具有惰性求值特性，只有被访问时才会重新计算...</div>
+        <div class="card-footer">
+          <div class="card-tags">
+            <span class="tag">Vue3</span>
+            <span class="tag">前端</span>
+            <span class="tag">响应式</span>
+          </div>
+          <span class="card-time">2026-03-10 16:42</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Docker Compose 常用命令速查</div>
+          <div class="card-actions">
+            <button class="card-action-btn" title="复制内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg></button>
+            <button class="card-action-btn" title="编辑" onclick="toggleEditModal()"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></button>
+            <button class="card-action-btn danger" title="删除" onclick="showConfirm('delete')"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg></button>
+          </div>
+        </div>
+        <div class="card-body">docker compose up -d 后台启动所有服务；docker compose down 停止并移除容器；docker compose logs -f
+          实时查看日志；docker compose exec service_name sh 进入容器；docker compose ps 查看运行状态...</div>
+        <div class="card-footer">
+          <div class="card-tags">
+            <span class="tag">Docker</span>
+            <span class="tag">运维</span>
+          </div>
+          <span class="card-time">2026-03-10 14:18</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">产品灵感：极简日记工具设计思路</div>
+          <div class="card-actions">
+            <button class="card-action-btn" title="复制内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg></button>
+            <button class="card-action-btn" title="编辑" onclick="toggleEditModal()"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></button>
+            <button class="card-action-btn danger" title="删除" onclick="showConfirm('delete')"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg></button>
+          </div>
+        </div>
+        <div class="card-body">核心理念：打开即写，关闭即存。不需要标题、不需要分类、不需要排版。每天只需要一个入口，记录当下的想法。界面只有一个输入框和一个时间轴。数据完全离线存储，支持导出为
+          Markdown 格式。</div>
+        <div class="card-footer">
+          <div class="card-tags">
+            <span class="tag">产品设计</span>
+            <span class="tag">灵感</span>
+          </div>
+          <span class="card-time">2026-03-09 21:05</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">CSS Grid 实现瀑布流布局的新方案</div>
+          <div class="card-actions">
+            <button class="card-action-btn" title="复制内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg></button>
+            <button class="card-action-btn" title="编辑" onclick="toggleEditModal()"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></button>
+            <button class="card-action-btn danger" title="删除" onclick="showConfirm('delete')"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg></button>
+          </div>
+        </div>
+        <div class="card-body">Chrome 117+ 已支持 CSS Grid 的 masonry 布局：grid-template-rows: masonry; 配合
+          grid-template-columns: repeat(3, 1fr); 可以实现原生瀑布流。暂未被所有浏览器支持，生产环境建议使用 polyfill 或降级方案。</div>
+        <div class="card-footer">
+          <div class="card-tags">
+            <span class="tag">CSS</span>
+            <span class="tag">布局</span>
+            <span class="tag">前端</span>
+          </div>
+          <span class="card-time">2026-03-09 09:30</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">阅读摘录：《认知觉醒》关于深度学习</div>
+          <div class="card-actions">
+            <button class="card-action-btn" title="复制内容"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg></button>
+            <button class="card-action-btn" title="编辑" onclick="toggleEditModal()"><svg viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg></button>
+            <button class="card-action-btn danger" title="删除" onclick="showConfirm('delete')"><svg viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg></button>
+          </div>
+        </div>
+        <div class="card-body">"真正的学习不是努力记住某些知识，而是在已知和未知之间建立连接。最好的学习方式是把新知识与自己已有的经验关联起来，用自己的话重新表述，然后在实践中不断修正。" —
+          周岭《认知觉醒》</div>
+        <div class="card-footer">
+          <div class="card-tags">
+            <span class="tag">阅读</span>
+            <span class="tag">摘录</span>
+          </div>
+          <span class="card-time">2026-03-08 22:15</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="12" y1="12" x2="12" y2="18" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
+      <h3>还没有任何记录</h3>
+      <p>在上方输入框中粘贴或输入内容，开始捕获你的第一条灵感碎片</p>
+    </div>
+
+    <!-- Search Empty -->
+    <div class="empty-state" id="searchEmpty" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <line x1="8" y1="11" x2="14" y2="11" />
+      </svg>
+      <h3>未找到相关记录</h3>
+      <p>尝试更换关键词，或清空搜索条件查看全部记录</p>
+    </div>
+  </main>
+
+  <!-- ===== Drawer ===== -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <aside class="drawer" id="drawer" aria-label="设置面板">
+    <div class="drawer-header">
+      <h2>设置</h2>
+      <button class="icon-btn" type="button" onclick="toggleDrawer()" title="关闭" aria-label="关闭设置面板">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <!-- WebDAV -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">WebDAV 配置</div>
+        <div class="form-group">
+          <label class="form-label">提供方</label>
+          <select class="form-input" id="providerSelect">
+            <option value="jianguoyun" data-address="https://dav.jianguoyun.com/dav/">坚果云</option>
+            <option value="aliyun" data-address="https://dav.aliyundrive.com/">阿里云盘</option>
+            <option value="custom" data-address="">自建 / 自定义</option>
+          </select>
+          <div class="form-hint">预置提供方无需手动填写服务器地址。</div>
+        </div>
+        <div class="form-group" id="presetAddress">
+          <div class="preset-address">
+            服务器地址已预置：<code id="presetAddressValue">https://dav.jianguoyun.com/dav/</code>
+          </div>
+        </div>
+        <div class="form-group" id="serverAddressGroup" style="display:none;">
+          <label class="form-label">服务器地址</label>
+          <input class="form-input" type="url" placeholder="https://dav.jianguoyun.com/dav/" />
+          <div class="form-hint">自定义时填写完整地址（含路径）。</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input class="form-input" type="text" placeholder="输入 WebDAV 用户名" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <div class="password-wrapper">
+            <input class="form-input" type="password" placeholder="输入 WebDAV 密码" id="pwdWebdav" />
+            <button class="password-toggle" title="显示/隐藏密码" onclick="togglePwd('pwdWebdav')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">加密密码</label>
+          <div class="password-wrapper">
+            <input class="form-input" type="password" placeholder="用于加密备份文件" id="pwdEncrypt" />
+            <button class="password-toggle" title="显示/隐藏密码" onclick="togglePwd('pwdEncrypt')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <button class="btn btn-outline btn-block" onclick="demoLoading(this, '连接成功')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:16px;height:16px">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            测试连接
+          </button>
+          <button class="btn btn-primary btn-block" onclick="demoLoading(this, '配置已保存')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:16px;height:16px">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            保存配置
+          </button>
+        </div>
+      </div>
+
+      <!-- Backup -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">WebDAV 备份与恢复</div>
+        <div class="section-hint">通过同源备份代理服务连接 WebDAV，规避跨域限制。</div>
+        <div class="btn-row" style="margin-bottom:12px;">
+          <button class="btn btn-primary" style="flex:1;" onclick="demoLoading(this, '备份成功')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:15px;height:15px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            一键备份
+          </button>
+          <button class="btn btn-outline" style="flex:1;" onclick="toggleBackupList()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:15px;height:15px">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+            刷新列表
+          </button>
+        </div>
+        <ul class="backup-file-list" id="backupFileList" style="display:none;">
+          <li class="backup-file-item">
+            <div>
+              <div class="file-name">snapkeep-backup-20260310.enc</div>
+              <div class="file-date">2026-03-10 15:30</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-outline" onclick="showConfirm('restore')">恢复</button>
+              <button class="btn btn-sm btn-danger" onclick="showConfirm('delete')">删除</button>
+            </div>
+          </li>
+          <li class="backup-file-item">
+            <div>
+              <div class="file-name">snapkeep-backup-20260308.enc</div>
+              <div class="file-date">2026-03-08 09:12</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-outline" onclick="showConfirm('restore')">恢复</button>
+              <button class="btn btn-sm btn-danger" onclick="showConfirm('delete')">删除</button>
+            </div>
+          </li>
+          <li class="backup-file-item">
+            <div>
+              <div class="file-name">snapkeep-backup-20260301.enc</div>
+              <div class="file-date">2026-03-01 20:45</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-outline" onclick="showConfirm('restore')">恢复</button>
+              <button class="btn btn-sm btn-danger" onclick="showConfirm('delete')">删除</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Export/Import -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">本地导出 / 导入</div>
+        <div class="btn-row">
+          <button class="btn btn-outline" style="flex:1;" onclick="showToast('success', '文件已导出至下载目录')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:15px;height:15px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            导出 JSON
+          </button>
+          <button class="btn btn-outline" style="flex:1;" onclick="showConfirm('import')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" style="width:15px;height:15px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            导入 JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Site Settings -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">网站设置</div>
+        <div class="form-group">
+          <label class="form-label">网站名称</label>
+          <input class="form-input" type="text" placeholder="SnapKeep " />
+        </div>
+        <div class="form-group">
+          <label class="form-label">图标</label>
+          <input class="form-input" type="text" placeholder="🔖 或 https://example.com/icon.png" />
+          <div class="form-hint">支持 emoji 或图片 URL。</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">数据统计</div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">128</div>
+            <div class="stat-label">记录总数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">2.4 MB</div>
+            <div class="stat-label">已用存储</div>
+          </div>
+          <div class="stat-card full">
+            <div class="stat-value" style="font-size:15px;">2026-03-10 15:30</div>
+            <div class="stat-label">上次备份时间</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">隐私与关于</div>
+        <p class="info-text">SnapKeep 为本地优先工具，数据默认仅存储于您的浏览器中。仅在用户主动备份/恢复时经备份代理转发，不做任何云端存储。</p>
+        <div class="form-hint"><span class="hint-badge">备份代理</span>配置将加密保存，仅用于备份/恢复。</div>
+        <p class="version-text">版本 v0.1.0-alpha.1（内测 Alpha）&middot; 本地优先版</p>
+        <div style="margin-top:12px;">
+          <button class="btn btn-outline btn-sm">部署说明</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Edit Modal ===== -->
+  <div class="modal-overlay" id="editOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="编辑记录">
+      <div class="modal-header">
+        <h3>编辑记录</h3>
+        <button class="icon-btn" type="button" onclick="toggleEditModal()" title="关闭" aria-label="关闭编辑弹窗">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea>Vue 3 的 reactive() 使用 Proxy 实现深层响应式追踪，ref() 则通过 getter/setter 包装基本类型。在 setup 函数中，watchEffect 会自动收集依赖并在变化时重新执行回调。computed 属性具有惰性求值特性，只有被访问时才会重新计算。
+
+对比 Vue 2 的 Object.defineProperty，Proxy 方案可以检测到属性的添加和删除，也能监听数组的索引变化，解决了 Vue 2 中的已知限制。</textarea>
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <input class="form-input" id="tagInputEdit" type="text" value="Vue3 前端 响应式"
+            oninput="renderTagPreviewById('tagInputEdit','tagPreviewEdit')"
+            onblur="normalizeTagInputById('tagInputEdit','tagPreviewEdit')" />
+          <div class="tag-preview" id="tagPreviewEdit" style="margin-top:10px;" aria-label="标签预览"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="toggleEditModal()">取消</button>
+        <button class="btn btn-primary" type="button"
+          onclick="toggleEditModal(); showToast('success', '记录已更新')">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Delete Confirm ===== -->
+  <div class="modal-overlay" id="deleteConfirm">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-label="确认删除">
+      <div class="confirm-icon danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+      </div>
+      <h3>确认删除</h3>
+      <p>此操作将永久删除该记录，删除后无法恢复。确定要继续吗？</p>
+      <div class="btn-row">
+        <button class="btn btn-outline" type="button" onclick="hideAllModals()">取消</button>
+        <button class="btn btn-danger" type="button"
+          onclick="hideAllModals(); showToast('success', '记录已删除')">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Import Confirm ===== -->
+  <div class="modal-overlay" id="importConfirm">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-label="确认导入">
+      <div class="confirm-icon warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </div>
+      <h3>确认导入</h3>
+      <p>导入将覆盖本地全部数据，此操作不可撤销。建议先导出当前数据作为备份。</p>
+      <div class="btn-row">
+        <button class="btn btn-outline" type="button" onclick="hideAllModals()">取消</button>
+        <button class="btn btn-primary" type="button"
+          onclick="hideAllModals(); showToast('success', '数据导入成功')">确认导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Restore Confirm ===== -->
+  <div class="modal-overlay" id="restoreConfirm">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-label="确认恢复">
+      <div class="confirm-icon warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </div>
+      <h3>确认恢复</h3>
+      <p>恢复将覆盖本地全部数据，此操作不可撤销。确定要从云端备份恢复吗？</p>
+      <div class="btn-row">
+        <button class="btn btn-outline" type="button" onclick="hideAllModals()">取消</button>
+        <button class="btn btn-primary" type="button"
+          onclick="hideAllModals(); showToast('success', '数据恢复成功')">确认恢复</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    var THEME_MODE_KEY = 'snapkeep-theme-mode';
+    var themeMode = 'system'; // system | light | dark
+    var prefersDarkMql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    function getSystemTheme() {
+      return prefersDarkMql && prefersDarkMql.matches ? 'dark' : 'light';
+    }
+
+    function updateThemeUI(actualTheme) {
+      var systemIcon = document.getElementById('themeSystem');
+      var sunIcon = document.getElementById('themeSun');
+      var moonIcon = document.getElementById('themeMoon');
+      var themeBtn = document.getElementById('themeBtn');
+
+      systemIcon.style.display = themeMode === 'system' ? '' : 'none';
+      sunIcon.style.display = themeMode === 'light' ? '' : 'none';
+      moonIcon.style.display = themeMode === 'dark' ? '' : 'none';
+
+      var titleMap = { system: '主题：跟随系统', light: '主题：亮色模式', dark: '主题：暗色模式' };
+      if (themeBtn) themeBtn.setAttribute('title', titleMap[themeMode] || '主题');
+
+      var items = [
+        { id: 'themeItemSystem', mode: 'system' },
+        { id: 'themeItemLight', mode: 'light' },
+        { id: 'themeItemDark', mode: 'dark' }
+      ];
+      items.forEach(function (it) {
+        var el = document.getElementById(it.id);
+        if (!el) return;
+        var active = themeMode === it.mode;
+        el.classList.toggle('active', active);
+        el.setAttribute('aria-checked', active ? 'true' : 'false');
+      });
+
+      var html = document.documentElement;
+      html.setAttribute('data-theme', actualTheme);
+      html.setAttribute('data-theme-mode', themeMode);
+    }
+
+    function applyThemeMode(mode) {
+      themeMode = mode || 'system';
+      var actualTheme = themeMode === 'system' ? getSystemTheme() : themeMode;
+      updateThemeUI(actualTheme);
+    }
+
+    function setThemeMode(mode, options) {
+      var opts = options || {};
+      applyThemeMode(mode);
+      if (opts.persist !== false) {
+        try { localStorage.setItem(THEME_MODE_KEY, themeMode); } catch (e) { }
+      }
+      closeThemeMenu();
+    }
+
+    function cycleThemeMode() {
+      var order = ['system', 'light', 'dark'];
+      var idx = order.indexOf(themeMode);
+      var next = order[(idx + 1) % order.length];
+      setThemeMode(next);
+    }
+
+    function toggleTheme() {
+      cycleThemeMode();
+    }
+
+    function toggleThemeMenu(e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      var menu = document.getElementById('themeMenu');
+      var btn = document.getElementById('themeBtn');
+      if (!menu) return;
+      var open = !menu.classList.contains('open');
+      menu.classList.toggle('open', open);
+      if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function closeThemeMenu() {
+      var menu = document.getElementById('themeMenu');
+      var btn = document.getElementById('themeBtn');
+      if (menu) menu.classList.remove('open');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleDrawer() {
+      closeThemeMenu();
+      document.getElementById('drawerOverlay').classList.toggle('open');
+      document.getElementById('drawer').classList.toggle('open');
+      var isOpen = document.getElementById('drawer').classList.contains('open');
+      var settingsBtn = document.getElementById('settingsBtn');
+      if (settingsBtn) settingsBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      syncBodyNoScroll();
+    }
+
+    function toggleEditModal() {
+      closeThemeMenu();
+      document.getElementById('editOverlay').classList.toggle('open');
+      syncBodyNoScroll();
+    }
+
+    function showConfirm(type) {
+      closeThemeMenu();
+      hideAllModals();
+      var el = document.getElementById(type + 'Confirm');
+      if (el) el.classList.add('open');
+      syncBodyNoScroll();
+    }
+
+    function hideAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(function (el) { el.classList.remove('open'); });
+      syncBodyNoScroll();
+    }
+
+    function showToast(type, message) {
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      var icon = type === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+      var msg = message || (type === 'success' ? '操作成功' : '操作失败，请检查网络后重试');
+      toast.innerHTML = icon + '<span>' + msg + '</span>';
+      container.appendChild(toast);
+      setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(30px)';
+        toast.style.transition = 'all 0.3s';
+        setTimeout(function () { toast.remove(); }, 300);
+      }, 2000);
+    }
+
+    function parseTags(text) {
+      if (!text) return [];
+      var tags = text
+        .split(/[\s,，]+/g)
+        .map(function (t) { return t.trim(); })
+        .filter(Boolean);
+      var seen = {};
+      return tags.filter(function (t) {
+        if (seen[t]) return false;
+        seen[t] = true;
+        return true;
+      });
+    }
+
+    function renderTagPreviewById(inputId, previewId) {
+      var input = document.getElementById(inputId);
+      var preview = document.getElementById(previewId);
+      if (!input || !preview) return;
+
+      var tags = parseTags(input.value);
+      preview.innerHTML = '';
+      if (!tags.length) {
+        preview.classList.remove('show');
+        return;
+      }
+      tags.forEach(function (t) {
+        var el = document.createElement('span');
+        el.className = 'tag tag-preview-item';
+        el.textContent = t;
+        preview.appendChild(el);
+      });
+      preview.classList.add('show');
+    }
+
+    function normalizeTagInputById(inputId, previewId) {
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      var tags = parseTags(input.value);
+      input.value = tags.join(', ');
+      if (previewId) renderTagPreviewById(inputId, previewId);
+    }
+
+    function showState(state, evt) {
+      var cardList = document.getElementById('cardList');
+      var emptyState = document.getElementById('emptyState');
+      var searchEmpty = document.getElementById('searchEmpty');
+      var searchCount = document.getElementById('searchCount');
+      var searchInput = document.getElementById('searchInput');
+      var cards = document.querySelectorAll('.card');
+
+      cardList.style.display = '';
+      emptyState.style.display = 'none';
+      searchEmpty.style.display = 'none';
+      searchCount.style.display = 'none';
+      searchInput.value = '';
+      cards.forEach(function (c) { c.style.display = ''; });
+
+      document.querySelectorAll('.spec-nav button').forEach(function (b) { b.classList.remove('active'); });
+      var e = evt || window.event;
+      if (e && e.target) e.target.classList.add('active');
+
+      switch (state) {
+        case 'empty':
+          cardList.style.display = 'none';
+          emptyState.style.display = '';
+          break;
+        case 'search':
+          searchInput.value = 'Vue';
+          searchCount.style.display = '';
+          searchCount.textContent = '2 条匹配';
+          cards.forEach(function (c, i) { c.style.display = (i === 0 || i === 3) ? '' : 'none'; });
+          break;
+        case 'searchEmpty':
+          cardList.style.display = 'none';
+          searchEmpty.style.display = '';
+          searchInput.value = 'xyznotexist';
+          searchCount.style.display = '';
+          searchCount.textContent = '0 条匹配';
+          break;
+      }
+    }
+
+    function togglePwd(id) {
+      var input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function toggleBackupList() {
+      var list = document.getElementById('backupFileList');
+      list.style.display = list.style.display === 'none' ? '' : 'none';
+    }
+
+    function demoLoading(btn, successMsg) {
+      var originalHTML = btn.innerHTML;
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="spinner"></span> 处理中...';
+      setTimeout(function () {
+        btn.classList.remove('loading');
+        btn.innerHTML = originalHTML;
+        showToast('success', successMsg);
+      }, 1500);
+    }
+
+    function syncBodyNoScroll() {
+      var drawerOpen = document.getElementById('drawer').classList.contains('open');
+      var modalOpen = document.querySelectorAll('.modal-overlay.open').length > 0;
+      document.body.classList.toggle('no-scroll', drawerOpen || modalOpen);
+    }
+
+    document.addEventListener('click', function () {
+      closeThemeMenu();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeThemeMenu();
+        hideAllModals();
+      }
+    });
+
+    if (prefersDarkMql) {
+      try {
+        prefersDarkMql.addEventListener('change', function () {
+          if (themeMode === 'system') applyThemeMode('system');
+        });
+      } catch (e) { }
+    }
+
+    (function initTheme() {
+      var saved = null;
+      try { saved = localStorage.getItem(THEME_MODE_KEY); } catch (e) { }
+      if (saved !== 'system' && saved !== 'light' && saved !== 'dark') saved = 'system';
+      setThemeMode(saved, { persist: false });
+    })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+      renderTagPreviewById('tagInputMain', 'tagPreviewMain');
+      renderTagPreviewById('tagInputEdit', 'tagPreviewEdit');
+      initProviderSelect();
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) hideAllModals();
+      });
+    });
+
+    function initProviderSelect() {
+      var select = document.getElementById('providerSelect');
+      var presetWrap = document.getElementById('presetAddress');
+      var presetValue = document.getElementById('presetAddressValue');
+      var serverGroup = document.getElementById('serverAddressGroup');
+      if (!select || !presetWrap || !presetValue || !serverGroup) return;
+
+      function updateProvider() {
+        var opt = select.options[select.selectedIndex];
+        var address = (opt && opt.getAttribute('data-address')) || '';
+        var isCustom = select.value === 'custom';
+        if (isCustom) {
+          serverGroup.style.display = '';
+          presetWrap.style.display = 'none';
+        } else {
+          serverGroup.style.display = 'none';
+          presetWrap.style.display = '';
+          presetValue.textContent = address || '—';
+        }
+      }
+
+      select.addEventListener('change', updateProvider);
+      updateProvider();
+    }
+  </script>
+</body>
+
+</html>

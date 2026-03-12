@@ -1,0 +1,104 @@
+/* ========== Design Tokens ========== */
+:root {
+  --bg-primary: #f6f7fb;
+  --bg-secondary: #eef1f7;
+  --bg-tertiary: #e6ebf4;
+  --bg-input: #f8f9fd;
+  --bg-card: #ffffff;
+  --bg-overlay: rgba(19, 22, 33, 0.45);
+  --bg-hover: #f2f5fb;
+  --bg-tag: #f1f3f8;
+  --bg-toast-success: #ecfdf5;
+  --bg-toast-error: #fef2f2;
+  --bg-badge: #ffe7c2;
+
+  --text-primary: #2a2f3a;
+  --text-secondary: #616a82;
+  --text-tertiary: #8c95ad;
+  --text-inverse: #ffffff;
+  --text-tag: #5b6b86;
+  --text-badge: #8a4b12;
+  --text-toast-success: #065f46;
+  --text-toast-error: #991b1b;
+
+  --border-primary: #e2e7f1;
+  --border-focus: #4c6fff;
+  --border-input: rgba(76, 111, 255, 0.18);
+  --border-input-strong: rgba(76, 111, 255, 0.35);
+  --border-tag: #e0e6f2;
+  --border-toast-success: #a7f3d0;
+  --border-toast-error: #fecaca;
+
+  --accent: #5b73e6;
+  --accent-hover: #4d64d6;
+  --accent-light: rgba(91, 115, 230, 0.16);
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-light: #fef2f2;
+
+  --shadow-sm: 0 6px 16px rgba(32, 42, 74, 0.08);
+  --shadow-md: 0 14px 34px rgba(32, 42, 74, 0.12);
+  --shadow-lg: 0 28px 60px rgba(32, 42, 74, 0.16);
+  --shadow-card: 0 12px 30px rgba(31, 39, 63, 0.08), 0 2px 6px rgba(31, 39, 63, 0.06);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --font-sans: 'Plus Jakarta Sans', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'ZCOOL XiaoWei', 'STKaiti', serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --line-height-tight: 1.4;
+  --line-height-base: 1.6;
+
+  --header-h: 56px;
+  --max-w: 1100px;
+  --drawer-w: 420px;
+  --transition: 0.2s ease;
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f1320;
+  --bg-secondary: #151a2a;
+  --bg-tertiary: #1d2438;
+  --bg-input: #1a2033;
+  --bg-card: #141a2a;
+  --bg-overlay: rgba(0, 0, 0, 0.65);
+  --bg-hover: #1e2740;
+  --bg-tag: rgba(115, 128, 170, 0.18);
+  --bg-toast-success: rgba(6, 95, 70, 0.2);
+  --bg-toast-error: rgba(153, 27, 27, 0.2);
+  --bg-badge: rgba(255, 231, 194, 0.14);
+
+  --text-primary: #e6e9f6;
+  --text-secondary: #a3acc4;
+  --text-tertiary: #76809a;
+  --text-inverse: #ffffff;
+  --text-tag: #b3bed8;
+  --text-badge: #ffd9a3;
+  --text-toast-success: #6ee7b7;
+  --text-toast-error: #fca5a5;
+
+  --border-primary: #262e46;
+  --border-focus: #6a8bff;
+  --border-input: rgba(106, 139, 255, 0.28);
+  --border-input-strong: rgba(106, 139, 255, 0.5);
+  --border-tag: rgba(145, 158, 196, 0.32);
+  --border-toast-success: rgba(110, 231, 183, 0.3);
+  --border-toast-error: rgba(252, 165, 165, 0.3);
+
+  --accent: #7a8ff2;
+  --accent-hover: #8ea2ff;
+  --accent-light: rgba(122, 143, 242, 0.2);
+
+  --shadow-sm: 0 6px 16px rgba(5, 8, 16, 0.4);
+  --shadow-md: 0 14px 34px rgba(5, 8, 16, 0.5);
+  --shadow-lg: 0 30px 70px rgba(5, 8, 16, 0.55);
+  --shadow-card: 0 12px 30px rgba(5, 8, 16, 0.45), 0 2px 6px rgba(5, 8, 16, 0.35);
+}
