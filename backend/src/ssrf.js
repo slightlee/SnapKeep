@@ -2,6 +2,22 @@ import ipaddr from 'ipaddr.js';
 import { URL } from 'node:url';
 
 const BLOCKED_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '[::]', '0.0.0.0']);
+const ALLOWED_WEBDAV_HOSTS = String(process.env.ALLOWED_WEBDAV_HOSTS || '')
+  .split(',')
+  .map((v) => v.trim().toLowerCase())
+  .filter(Boolean);
+
+function isHostAllowed(hostname) {
+  if (!ALLOWED_WEBDAV_HOSTS.length) return true;
+  const normalizedHost = String(hostname || '').toLowerCase();
+  return ALLOWED_WEBDAV_HOSTS.some((rule) => {
+    if (rule.startsWith('*.')) {
+      const suffix = rule.slice(1); // .example.com
+      return normalizedHost.endsWith(suffix) && normalizedHost.length > suffix.length;
+    }
+    return normalizedHost === rule;
+  });
+}
 
 function isPrivateIP(ip) {
   try {
@@ -53,6 +69,10 @@ export async function validateServerUrl(url) {
   }
 
   const hostname = parsed.hostname;
+
+  if (!isHostAllowed(hostname)) {
+    throw new Error('服务器地址不在允许列表');
+  }
 
   // 检查是否为本地主机名
   if (BLOCKED_HOSTS.has(hostname.toLowerCase())) {

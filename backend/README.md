@@ -1,80 +1,109 @@
 # SnapKeep 备份代理服务
 
-WebDAV 备份代理服务，用于解决浏览器前端直连 WebDAV 时的 CORS 跨域限制问题。
+Node.js 实现的 WebDAV 备份代理，用于解决浏览器前端直连 WebDAV 时的跨域限制。
 
 ## 功能特性
 
-- **同源代理**：前端通过同源 `/api/backup/*` 接口访问，规避 CORS 限制
-- **SSRF 防护**：内置目标地址校验，禁止访问内网/本地地址
-- **流式转发**：支持大文件备份/恢复的流式传输
-- **配置加密**：WebDAV 凭据使用 AES-256-GCM 加密存储
-- **统一接口**：标准化的 REST API 设计
+- 同源代理：统一走 `/api/backup/*`
+- SSRF 防护：拦截本地/内网目标地址
+- WebDAV 主机白名单：可限制仅允许指定主机
+- 请求体大小限制：JSON 与上传接口可分别限流量
+- 基础鉴权：支持 `X-API-Key` / `Authorization: Bearer`
+- 基础限流：按 IP 限制单位时间请求数
+- 上游超时控制：避免慢连接长期占用资源
 
 ## 接口列表
 
 | 接口 | 方法 | 说明 |
-|------|------|------|
+| --- | --- | --- |
 | `/api/backup/health` | GET | 健康检查 |
-| `/api/backup/config` | POST | 保存 WebDAV 配置（加密存储） |
 | `/api/backup/test` | POST | 测试 WebDAV 连接 |
-| `/api/backup/list` | POST | 列出备份文件列表 |
-| `/api/backup/get` | POST | 下载备份文件（流式） |
-| `/api/backup/put` | POST | 上传备份文件（流式） |
+| `/api/backup/list` | POST | 列出备份文件 |
+| `/api/backup/get` | POST | 下载备份文件 |
+| `/api/backup/put` | POST | 上传备份文件 |
+| `/api/backup/delete` | POST | 删除备份文件 |
 
 ## 快速开始
 
-### 安装依赖
-
 ```bash
 pnpm install
+pnpm dev
 ```
 
-### 启动服务
+默认监听：`http://localhost:3001`
+
+### Docker 启动（推荐生产）
 
 ```bash
-# 开发模式
-pnpm dev
-
-# 或指定端口
-PORT=3001 pnpm dev
+cd backend
+cp .env.example .env
+# 编辑 .env 后启动
+sudo docker compose up -d --build
 ```
 
-服务默认监听 `http://localhost:3001`
+查看状态：
 
-### 环境变量
+```bash
+sudo docker compose ps
+sudo docker compose logs -f --tail=100
+```
 
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `PORT` | `3001` | 服务端口 |
-| `BACKUP_PROXY_PORT` | `3001` | 备选端口配置 |
+## 环境变量
+
+服务启动时会自动读取 `backend/.env`。建议先复制示例文件：
+
+```bash
+cp .env.example .env
+```
+
+优先级说明：运行环境中已存在的同名环境变量优先，`.env` 仅用于补充未设置项。
+
+关键变量：
+
+- `PORT`：服务端口，默认 `3001`
+- `PUBLIC_PORT`：Docker 宿主机映射端口，默认 `43001`
+- `NODE_OPTIONS`：Node 启动参数，默认建议 `--max-old-space-size=128`
+- `CONTAINER_MEM_LIMIT`：Docker 容器内存上限（如 `256m`，由 `docker-compose.yml` 读取）
+- `BACKUP_API_KEY`：接口鉴权密钥（公网建议必配）
+- `ALLOWED_ORIGINS`：允许的前端来源（逗号分隔）
+- `ALLOWED_WEBDAV_HOSTS`：允许连接的 WebDAV 主机（逗号分隔，支持 `*.domain`）
+- `JSON_BODY_MAX_BYTES`：JSON 请求体大小上限（字节）
+- `UPLOAD_BODY_MAX_BYTES`：上传请求体大小上限（字节）
+- `RATE_LIMIT_WINDOW_MS`：限流窗口时长（毫秒）
+- `RATE_LIMIT_MAX_REQUESTS`：窗口内最大请求数
+- `WEBDAV_TIMEOUT_MS`：单次 WebDAV 请求超时（毫秒）
 
 ## 请求示例
 
 ### 健康检查
 
 ```bash
-curl http://localhost:3001/api/backup/health
+curl "http://localhost:3001/api/backup/health"
 ```
 
-### 保存配置
+### 鉴权联调（`BACKUP_API_KEY`）
+
+当 `.env` 配置了 `BACKUP_API_KEY` 后，除 `/api/backup/health` 外的接口都需要携带 `X-API-Key`（或 `Authorization: Bearer`）。
 
 ```bash
-curl -X POST http://localhost:3001/api/backup/config \
+# 未带 key：应返回 401
+curl -X POST "http://localhost:3001/api/backup/list" \
   -H "Content-Type: application/json" \
-  -d '{
-    "server": "https://dav.jianguoyun.com/dav/",
-    "username": "your-username",
-    "password": "your-password",
-    "provider": "jianguoyun",
-    "encryptPwd": "your-encryption-password"
-  }'
+  -d '{}'
+
+# 带 key：不再返回 401（后续可能进入业务参数校验）
+curl -X POST "http://localhost:3001/api/backup/list" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
+  -d '{}'
 ```
 
 ### 测试连接
 
 ```bash
-curl -X POST http://localhost:3001/api/backup/test \
+curl -X POST "http://localhost:3001/api/backup/test" \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-api-key>" \
   -d '{
     "server": "https://dav.jianguoyun.com/dav/",
     "username": "your-username",
@@ -82,75 +111,23 @@ curl -X POST http://localhost:3001/api/backup/test \
   }'
 ```
 
-### 列出备份文件
-
-```bash
-curl -X POST http://localhost:3001/api/backup/test \
-  -H "Content-Type: application/json" \
-  -d '{
-    "encryptPwd": "your-encryption-password"
-  }'
-```
-
-### 下载备份文件
-
-```bash
-curl -X POST http://localhost:3001/api/backup/get \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fileName": "snapkeep-backup-20260312120000.encrypted",
-    "encryptPwd": "your-encryption-password"
-  }' \
-  --output backup.encrypted
-```
-
 ### 上传备份文件
 
 ```bash
-curl -X POST http://localhost:3001/api/backup/put \
+curl -X POST "http://localhost:3001/api/backup/put" \
   -H "Content-Type: text/plain" \
+  -H "X-API-Key: <your-api-key>" \
   -H "x-backup-file-name: snapkeep-backup-20260312120000.encrypted" \
-  -H "x-backup-encrypt-pwd: your-encryption-password" \
+  -H "x-backup-server: https://dav.jianguoyun.com/dav/" \
+  -H "x-backup-username: your-username" \
+  -H "x-backup-password: your-password" \
   --data-binary @backup.encrypted
 ```
 
-## 项目结构
+## 部署建议
 
-```
-backend/
-├── src/
-│   ├── index.js        # 服务入口，HTTP 路由
-│   ├── http.js         # HTTP 工具函数
-│   ├── ssrf.js         # SSRF 防护，URL 校验
-│   ├── configStore.js  # 配置加密存储
-│   └── webdav.js       # WebDAV 客户端封装
-├── package.json
-└── README.md
-```
-
-## 安全说明
-
-1. **SSRF 防护**：服务会校验目标 URL，禁止访问本地地址（127.0.0.1, localhost 等）和内网地址（10.x.x.x, 192.168.x.x 等）
-2. **配置加密**：WebDAV 密码使用用户提供的加密密码进行 AES-256-GCM 加密后存储
-3. **无持久化存储**：除加密的配置文件外，服务不存储任何用户数据
-
-## 与前端集成
-
-前端开发时，可通过配置代理将 `/api/backup/*` 请求转发到本服务：
-
-**vite.config.js 示例：**
-
-```javascript
-export default {
-  server: {
-    proxy: {
-      '/api/backup': {
-        target: 'http://localhost:3001',
-        changeOrigin: true
-      }
-    }
-  }
-}
-```
-
-生产环境部署时，可将前端静态资源和本服务部署在同一域名下，或使用反向代理（如 Nginx）进行路由。
+- 生产环境建议启用 `BACKUP_API_KEY`、`ALLOWED_WEBDAV_HOSTS`、`ALLOWED_ORIGINS`
+- 建议结合你现有网关或防火墙策略配置 HTTPS、连接数和请求体限制
+- 若前端与代理非同源，请显式配置 `ALLOWED_ORIGINS`
+- 小内存机器建议同时配置：`NODE_OPTIONS=--max-old-space-size=96~128`、`CONTAINER_MEM_LIMIT=192m~256m`
+- 部署文档（Docker-only）：[deploy/README.md](/Users/ming/ai-project/SnapKeep/backend/deploy/README.md)

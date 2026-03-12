@@ -2,6 +2,20 @@ import https from 'node:https';
 import http from 'node:http';
 import { URL } from 'node:url';
 
+function parsePositiveInt(value, fallback) {
+  const n = Number.parseInt(String(value || ''), 10);
+  if (Number.isNaN(n) || n <= 0) return fallback;
+  return n;
+}
+
+const WEBDAV_TIMEOUT_MS = parsePositiveInt(process.env.WEBDAV_TIMEOUT_MS, 15000);
+
+function applyRequestTimeout(req) {
+  req.setTimeout(WEBDAV_TIMEOUT_MS, () => {
+    req.destroy(new Error(`WebDAV 请求超时（>${WEBDAV_TIMEOUT_MS}ms）`));
+  });
+}
+
 export function buildAuthHeaders({ username, password }) {
   const token = Buffer.from(`${username}:${password}`).toString('base64');
   return {
@@ -22,7 +36,9 @@ export function createWebdavRequest({ url, method, headers }) {
       'User-Agent': 'SnapKeep-BackupProxy/0.1.0'
     }
   };
-  return client.request(options);
+  const req = client.request(options);
+  applyRequestTimeout(req);
+  return req;
 }
 
 export function getTargetUrl(server, fileName) {
@@ -89,6 +105,7 @@ async function webdavRequest(url, options) {
         });
       });
     });
+    applyRequestTimeout(req);
     req.on('error', (err) => {
       reject(new Error(`网络请求失败: ${err.message}`));
     });

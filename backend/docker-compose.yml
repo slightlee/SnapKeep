@@ -1,0 +1,24 @@
+services:
+  snapkeep-backup-proxy:
+    container_name: snapkeep-backup-proxy
+    image: ${IMAGE_NAME:-snapkeep-backup-proxy}:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # 限制 Node 堆内存，避免在小内存机器上无限增长
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=128}
+    env_file:
+      - .env
+    restart: unless-stopped
+    mem_limit: ${CONTAINER_MEM_LIMIT:-256m}
+    memswap_limit: ${CONTAINER_MEM_LIMIT:-256m}
+    pids_limit: 128
+    ports:
+      - "${PUBLIC_PORT:-43001}:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/backup/health | grep -q '\"success\":true'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
