@@ -26,6 +26,150 @@
     </div>
     <div class="drawer-body">
       <div class="drawer-section">
+        <div class="drawer-section-title">WebDAV 备份与恢复</div>
+        <div class="section-hint">通过同源备份代理服务连接 WebDAV，规避跨域限制。</div>
+        <div class="btn-row" style="margin-bottom: 12px">
+          <button
+            class="btn btn-primary"
+            style="flex: 1"
+            type="button"
+            :disabled="isBackingUp"
+            @click="$emit('backup')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 15px; height: 15px"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            {{ isBackingUp ? '备份中...' : '一键备份' }}
+          </button>
+          <button
+            class="btn btn-outline"
+            style="flex: 1"
+            type="button"
+            :disabled="isRefreshingList"
+            @click="$emit('refresh-backups')"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 15px; height: 15px"
+              aria-hidden="true"
+            >
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+              <polyline points="21 3 21 9 15 9" />
+            </svg>
+            {{ isRefreshingList ? '刷新中...' : '刷新列表' }}
+          </button>
+        </div>
+        <ul v-show="backupFiles.length" class="backup-file-list">
+          <li v-for="file in backupFiles" :key="file.name" class="backup-file-item">
+            <div>
+              <div class="file-name">{{ file.name }}</div>
+              <div class="file-date">{{ formatBackupTime(file.lastModified) }}</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button
+                class="btn btn-outline btn-sm"
+                type="button"
+                @click="$emit('restore', file.name)"
+              >
+                恢复
+              </button>
+              <button
+                class="btn btn-danger btn-sm"
+                type="button"
+                @click="$emit('delete-backup', file.name)"
+              >
+                删除
+              </button>
+            </div>
+          </li>
+        </ul>
+        <div class="info-text" style="margin-top: 10px">{{ backupListHint }}</div>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-title">本地导出 / 导入</div>
+        <div class="btn-row">
+          <button class="btn btn-outline" style="flex: 1" type="button" @click="$emit('export')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 15px; height: 15px"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            导出 JSON
+          </button>
+          <button class="btn btn-outline" style="flex: 1" type="button" @click="$emit('import')">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 15px; height: 15px"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            导入 JSON
+          </button>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-title">网站设置</div>
+        <div class="form-group">
+          <label class="form-label" for="siteName">网站名称</label>
+          <input
+            id="siteName"
+            class="form-input"
+            type="text"
+            :value="siteName"
+            placeholder="SnapKeep "
+            @input="$emit('update:site-name', $event.target.value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="siteIcon">图标</label>
+          <input
+            id="siteIcon"
+            class="form-input"
+            type="text"
+            :value="siteIcon"
+            placeholder="🔖 或 https://example.com/icon.png"
+            @input="$emit('update:site-icon', $event.target.value)"
+          />
+          <div class="form-hint">支持 emoji 或图片 URL。</div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
         <div class="drawer-section-title">WebDAV 配置</div>
         <div class="form-group">
           <label class="form-label" for="backupProxyUrl">备份代理地址</label>
@@ -190,150 +334,6 @@
             </svg>
             保存配置
           </button>
-        </div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">WebDAV 备份与恢复</div>
-        <div class="section-hint">通过同源备份代理服务连接 WebDAV，规避跨域限制。</div>
-        <div class="btn-row" style="margin-bottom: 12px">
-          <button
-            class="btn btn-primary"
-            style="flex: 1"
-            type="button"
-            :disabled="isBackingUp"
-            @click="$emit('backup')"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="width: 15px; height: 15px"
-              aria-hidden="true"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            {{ isBackingUp ? '备份中...' : '一键备份' }}
-          </button>
-          <button
-            class="btn btn-outline"
-            style="flex: 1"
-            type="button"
-            :disabled="isRefreshingList"
-            @click="$emit('refresh-backups')"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="width: 15px; height: 15px"
-              aria-hidden="true"
-            >
-              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-              <polyline points="21 3 21 9 15 9" />
-            </svg>
-            {{ isRefreshingList ? '刷新中...' : '刷新列表' }}
-          </button>
-        </div>
-        <ul v-show="backupFiles.length" class="backup-file-list">
-          <li v-for="file in backupFiles" :key="file.name" class="backup-file-item">
-            <div>
-              <div class="file-name">{{ file.name }}</div>
-              <div class="file-date">{{ formatBackupTime(file.lastModified) }}</div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button
-                class="btn btn-outline btn-sm"
-                type="button"
-                @click="$emit('restore', file.name)"
-              >
-                恢复
-              </button>
-              <button
-                class="btn btn-danger btn-sm"
-                type="button"
-                @click="$emit('delete-backup', file.name)"
-              >
-                删除
-              </button>
-            </div>
-          </li>
-        </ul>
-        <div class="info-text" style="margin-top: 10px">{{ backupListHint }}</div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">本地导出 / 导入</div>
-        <div class="btn-row">
-          <button class="btn btn-outline" style="flex: 1" type="button" @click="$emit('export')">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="width: 15px; height: 15px"
-              aria-hidden="true"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            导出 JSON
-          </button>
-          <button class="btn btn-outline" style="flex: 1" type="button" @click="$emit('import')">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="width: 15px; height: 15px"
-              aria-hidden="true"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            导入 JSON
-          </button>
-        </div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">网站设置</div>
-        <div class="form-group">
-          <label class="form-label" for="siteName">网站名称</label>
-          <input
-            id="siteName"
-            class="form-input"
-            type="text"
-            :value="siteName"
-            placeholder="SnapKeep "
-            @input="$emit('update:site-name', $event.target.value)"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="siteIcon">图标</label>
-          <input
-            id="siteIcon"
-            class="form-input"
-            type="text"
-            :value="siteIcon"
-            placeholder="🔖 或 https://example.com/icon.png"
-            @input="$emit('update:site-icon', $event.target.value)"
-          />
-          <div class="form-hint">支持 emoji 或图片 URL。</div>
         </div>
       </div>
 
