@@ -15,6 +15,7 @@ REMOTE_DIR="${REMOTE_DIR:-/opt/snapkeep/backend}"
 SSH_PORT="${SSH_PORT:-22}"
 IMAGE_NAME="${IMAGE_NAME:-snapkeep-backup-proxy}"
 TAG="${TAG:-${IMAGE_TAG:-}}"
+SYNC_ENV="${SYNC_ENV:-1}"
 # ============================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,6 +55,8 @@ LOCAL_COMPOSE_CMD=()
 COMPRESS_CMD=(gzip -1)
 DECOMPRESS_CMD="gunzip"
 IMAGE_REF=""
+LOCAL_ENV_FILE=""
+HAS_LOCAL_ENV="0"
 
 ssh_cmd() {
   ssh "${SSH_OPTS[@]}" "$REMOTE_USER@$REMOTE_HOST" "$@"
@@ -119,6 +122,16 @@ check_prerequisites() {
   [[ -f "$BACKEND_ROOT/Dockerfile" ]] || { log_error "缺少 Dockerfile"; exit 1; }
   [[ -f "$BACKEND_ROOT/docker-compose.yml" ]] || { log_error "缺少 docker-compose.yml"; exit 1; }
   [[ -f "$BACKEND_ROOT/.env.example" ]] || { log_error "缺少 .env.example"; exit 1; }
+  LOCAL_ENV_FILE="$BACKEND_ROOT/.env"
+
+  if [[ "$SYNC_ENV" == "1" ]]; then
+    if [[ -f "$LOCAL_ENV_FILE" ]]; then
+      HAS_LOCAL_ENV="1"
+      log_info "检测到本地 .env，部署时将覆盖远端 .env"
+    else
+      log_warn "SYNC_ENV=1 但本地缺少 .env，本次不会覆盖远端 .env"
+    fi
+  fi
 
   chmod 400 "$PEM_KEY_PATH"
 
@@ -172,6 +185,10 @@ transfer_config() {
   ssh_cmd "mkdir -p \"$REMOTE_DIR\""
   scp_cmd "$BACKEND_ROOT/docker-compose.yml" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/docker-compose.yml"
   scp_cmd "$BACKEND_ROOT/.env.example" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/.env.example"
+  if [[ "$SYNC_ENV" == "1" && "$HAS_LOCAL_ENV" == "1" ]]; then
+    scp_cmd "$LOCAL_ENV_FILE" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/.env"
+    log_info "已覆盖远端 .env"
+  fi
 
   log_info "部署文件同步完成"
 }

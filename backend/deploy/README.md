@@ -26,13 +26,14 @@ REMOTE_DIR=/opt/snapkeep/backend \
 - `SSH_PORT`：默认 `22`
 - `IMAGE_NAME`：默认 `snapkeep-backup-proxy`
 - `IMAGE_TAG`：默认自动取当前 Git 短提交哈希（也兼容 `TAG`）
+- `SYNC_ENV`：默认 `1`，会同步并覆盖远端 `.env`；设为 `0` 可关闭
 - 第一个位置参数也可传主机：`./remote-deploy.sh <host>`
 
 脚本会自动完成：
 
 1. 在本地构建镜像（可通过 `IMAGE_NAME` / `IMAGE_TAG` 指定名称和版本）
 2. 通过 SSH 传输镜像到远程并 `docker load`
-3. 同步 `docker-compose.yml` 与 `.env.example` 到 `REMOTE_DIR`
+3. 同步 `docker-compose.yml`、`.env.example` 到 `REMOTE_DIR`，并在默认配置下覆盖远端 `.env`
 4. 远程执行 `docker compose up -d --no-build --remove-orphans`
 
 ## 必填环境变量（.env）
