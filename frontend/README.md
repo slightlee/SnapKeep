@@ -15,6 +15,21 @@ pnpm install
 pnpm dev
 ```
 
+环境变量（可选）
+1. `VITE_BACKUP_API_KEY`：前端请求自动携带的 `X-API-Key`（用于后端开启 `BACKUP_API_KEY` 的场景）。
+2. `VITE_BACKUP_PROXY_BASE_URL`：前端默认代理地址（默认 `/api/backup`）。
+
+鉴权联调测试
+1. 在 `frontend/.env.local` 写入：
+```bash
+VITE_BACKUP_API_KEY=your-strong-key
+# 可选：前端默认代理地址
+VITE_BACKUP_PROXY_BASE_URL=/api/backup
+```
+2. 重启 `pnpm dev`（Vite 只在启动时读取 env）。
+3. 页面点击“测试连接”，并在浏览器 Network 中检查请求头是否包含 `X-API-Key`。
+4. 若用户在设置里填写了“备份代理地址”，请求会优先走用户填写地址。
+
 常用脚本
 1. `pnpm run dev` 启动开发服务器
 2. `pnpm run build` 构建生产包

@@ -337,6 +337,7 @@
       :webdav-user="webdavUser"
       :webdav-pwd="webdavPwd"
       :encrypt-pwd="encryptPwd"
+      :backup-proxy-url="backupProxyUrl"
       :show-webdav-pwd="showWebdavPwd"
       :show-encrypt-pwd="showEncryptPwd"
       :is-testing-webdav="isTestingWebdav"
@@ -357,6 +358,7 @@
       @update:webdav-user="webdavUser = $event"
       @update:webdav-pwd="webdavPwd = $event"
       @update:encrypt-pwd="encryptPwd = $event"
+      @update:backup-proxy-url="backupProxyUrl = $event"
       @toggle-webdav-pwd="showWebdavPwd = !showWebdavPwd"
       @toggle-encrypt-pwd="showEncryptPwd = !showEncryptPwd"
       @test-webdav="handleTestWebdav"
@@ -446,7 +448,14 @@
     THEME_KEY
   } from '../constants/index.js';
   import { decryptText, encryptText } from '../core/encrypt/crypto.js';
-  import { getTextFile, listBackups, putTextFile, testConnection } from '../core/webdav/index.js';
+  import {
+    deleteTextFile,
+    getTextFile,
+    listBackups,
+    putTextFile,
+    setBackupProxyBaseUrl,
+    testConnection
+  } from '../core/webdav/index.js';
   import {
     formatBytes,
     formatDateTime,
@@ -515,6 +524,7 @@
     listBackups,
     putTextFile,
     getTextFile,
+    deleteTextFile,
     testConnection,
     notes: notesApi.notes,
     refreshStats: () => statsApi.refreshStats(),
@@ -522,7 +532,8 @@
     appVersion: APP_VERSION,
     timestampYYYYMMDDHHmmss,
     formatDateTime,
-    lastBackupKey: LAST_BACKUP_KEY
+    lastBackupKey: LAST_BACKUP_KEY,
+    setBackupProxyBaseUrl
   });
 
   const {
@@ -578,6 +589,7 @@
     webdavUser,
     webdavPwd,
     encryptPwd,
+    backupProxyUrl,
     showWebdavPwd,
     showEncryptPwd,
     isCustomProvider,

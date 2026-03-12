@@ -9,6 +9,7 @@ export const useWebdavBackup = ({
   listBackups,
   putTextFile,
   getTextFile,
+  deleteTextFile,
   testConnection,
   notes,
   refreshStats,
@@ -16,7 +17,8 @@ export const useWebdavBackup = ({
   appVersion,
   timestampYYYYMMDDHHmmss,
   formatDateTime,
-  lastBackupKey
+  lastBackupKey,
+  setBackupProxyBaseUrl
 }) => {
   const WEBDAV_PROVIDERS = [
     { key: 'jianguoyun', label: '坚果云', address: 'https://dav.jianguoyun.com/dav/' },
@@ -30,6 +32,7 @@ export const useWebdavBackup = ({
   const webdavUser = ref('');
   const webdavPwd = ref('');
   const encryptPwd = ref('');
+  const backupProxyUrl = ref('');
   const showWebdavPwd = ref(false);
   const showEncryptPwd = ref(false);
 
@@ -41,7 +44,8 @@ export const useWebdavBackup = ({
       server: isCustomProvider.value ? webdavServer.value : WEBDAV_PROVIDERS.find(p => p.key === webdavProvider.value)?.address || '',
       username: webdavUser.value,
       password: webdavPwd.value,
-      encryptPwd: encryptPwd.value
+      encryptPwd: encryptPwd.value,
+      backupProxyUrl: backupProxyUrl.value.trim()
     };
     await settingsOps.set(WEBDAV_CONFIG_KEY, config);
   };
@@ -69,6 +73,7 @@ export const useWebdavBackup = ({
       
       // 加载数据加密密码
       encryptPwd.value = config.encryptPwd || '';
+      backupProxyUrl.value = config.backupProxyUrl || '';
       
       if (config.provider === 'custom') {
         webdavServer.value = config.server || '';
@@ -80,6 +85,7 @@ export const useWebdavBackup = ({
         }
       }
     }
+    setBackupProxyBaseUrl?.(backupProxyUrl.value);
   };
 
   const backupFiles = ref([]);
@@ -94,18 +100,6 @@ export const useWebdavBackup = ({
   const isCustomProvider = computed(() => webdavProvider.value === 'custom');
   const presetServerAddress = computed(() => selectedWebdavProvider.value.address || '');
 
-  const normalizeServerForCompare = (value) =>
-    String(value || '')
-      .trim()
-      .replace(/\/+$/, '');
-  const resolveProviderKey = (server) => {
-    const normalized = normalizeServerForCompare(server);
-    const match = WEBDAV_PROVIDERS.find(
-      (p) => p.address && normalizeServerForCompare(p.address) === normalized
-    );
-    return match ? match.key : 'custom';
-  };
-
   watch(webdavProvider, (next, prev) => {
     // 切换提供方时清空用户名和密码
     webdavUser.value = '';
@@ -118,6 +112,10 @@ export const useWebdavBackup = ({
       const provider = WEBDAV_PROVIDERS.find((p) => p.key === next) || WEBDAV_PROVIDERS[0];
       webdavServer.value = provider.address;
     }
+  });
+
+  watch(backupProxyUrl, (next) => {
+    setBackupProxyBaseUrl?.(next);
   });
 
   const getWebdavAuth = async () => {
@@ -252,20 +250,10 @@ export const useWebdavBackup = ({
     if (!pendingDeleteFile.value) return;
     try {
       const auth = await getWebdavAuth();
-      const response = await fetch('/api/backup/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...auth,
-          fileName: pendingDeleteFile.value
-        })
+      await deleteTextFile({
+        ...auth,
+        fileName: pendingDeleteFile.value
       });
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.message || '删除失败');
-      }
       pendingDeleteFile.value = null;
       await refreshBackupList();
       showToast('success', '删除成功');
@@ -285,6 +273,7 @@ export const useWebdavBackup = ({
     webdavUser,
     webdavPwd,
     encryptPwd,
+    backupProxyUrl,
     showWebdavPwd,
     showEncryptPwd,
     isCustomProvider,

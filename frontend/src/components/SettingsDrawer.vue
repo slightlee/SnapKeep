@@ -28,6 +28,18 @@
       <div class="drawer-section">
         <div class="drawer-section-title">WebDAV 配置</div>
         <div class="form-group">
+          <label class="form-label" for="backupProxyUrl">备份代理地址</label>
+          <input
+            id="backupProxyUrl"
+            class="form-input"
+            type="url"
+            :value="backupProxyUrl"
+            placeholder="https://api.example.com/api/backup（留空使用默认）"
+            @input="$emit('update:backup-proxy-url', $event.target.value)"
+          />
+          <div class="form-hint">填写你自己的代理地址；留空时自动使用默认代理地址。</div>
+        </div>
+        <div class="form-group">
           <label class="form-label" for="webdavProvider">提供方</label>
           <select
             id="webdavProvider"
@@ -369,6 +381,7 @@
     webdavUser: { type: String, default: '' },
     webdavPwd: { type: String, default: '' },
     encryptPwd: { type: String, default: '' },
+    backupProxyUrl: { type: String, default: '' },
     showWebdavPwd: { type: Boolean, default: false },
     showEncryptPwd: { type: Boolean, default: false },
     isTestingWebdav: { type: Boolean, default: false },
@@ -392,6 +405,7 @@
     'update:webdav-user',
     'update:webdav-pwd',
     'update:encrypt-pwd',
+    'update:backup-proxy-url',
     'toggle-webdav-pwd',
     'toggle-encrypt-pwd',
     'test-webdav',
