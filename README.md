@@ -34,6 +34,9 @@ cd frontend && pnpm install && pnpm dev
 - 前端说明：[frontend/README.md](./frontend/README.md)
 - 后端说明：[backend/README.md](./backend/README.md)
 - 后端部署：[backend/deploy/README.md](./backend/deploy/README.md)
+- Git 提交规范：[doc/Git提交规范.md](./doc/Git提交规范.md)
+- 版本定义规范：[doc/版本定义规范.md](./doc/版本定义规范.md)
+- 发布流程：[doc/发布流程.md](./doc/发布流程.md)
 
 ## License
 
