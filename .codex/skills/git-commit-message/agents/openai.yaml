@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit Message"
+  short_description: "Generate, validate, and split Git commit messages from diffs"
+  default_prompt: "Use $git-commit-message to generate or validate a commit message from the current staged changes and repo rules."
