@@ -18,12 +18,22 @@ function parsePositiveInt(value, fallback) {
   return n;
 }
 
+function parseBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+  return fallback;
+}
+
 const PORT = Number.parseInt(process.env.PORT || process.env.BACKUP_PROXY_PORT || '3001', 10);
 const JSON_BODY_MAX_BYTES = parsePositiveInt(process.env.JSON_BODY_MAX_BYTES, 1024 * 1024);
 const UPLOAD_BODY_MAX_BYTES = parsePositiveInt(process.env.UPLOAD_BODY_MAX_BYTES, 8 * 1024 * 1024);
 const RATE_LIMIT_WINDOW_MS = parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60 * 1000);
 const RATE_LIMIT_MAX_REQUESTS = parsePositiveInt(process.env.RATE_LIMIT_MAX_REQUESTS, 120);
 const BACKUP_API_KEY = String(process.env.BACKUP_API_KEY || '').trim();
+const REQUIRE_WORKER_TOKEN = parseBoolean(process.env.REQUIRE_WORKER_TOKEN, false);
+const WORKER_TOKEN = String(process.env.WORKER_TOKEN || '').trim();
 const ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((v) => v.trim())
@@ -99,6 +109,24 @@ function isAuthorized(req) {
   const headerKey = String(pickHeader(req, 'x-api-key') || '').trim();
   const bearerToken = readBearerToken(req);
   return headerKey === BACKUP_API_KEY || bearerToken === BACKUP_API_KEY;
+}
+
+function isLoopbackAddress(address) {
+  if (!address) return false;
+  if (address === '127.0.0.1' || address === '::1') return true;
+  if (address.startsWith('::ffff:')) {
+    const ipv4 = address.slice(7);
+    return ipv4 === '127.0.0.1';
+  }
+  return false;
+}
+
+function isWorkerAuthorized(req) {
+  if (!REQUIRE_WORKER_TOKEN) return true;
+  if (!WORKER_TOKEN) return false;
+  if (isLoopbackAddress(req.socket?.remoteAddress || '')) return true;
+  const token = String(pickHeader(req, 'x-worker-token') || '').trim();
+  return token === WORKER_TOKEN;
 }
 
 function readClientIp(req) {
@@ -393,6 +421,15 @@ const server = http.createServer(async (req, res) => {
 
   if (!pathname.startsWith('/api/backup/')) {
     sendError(res, 404, '接口不存在');
+    return;
+  }
+
+  if (REQUIRE_WORKER_TOKEN && !WORKER_TOKEN) {
+    sendError(res, 500, '服务端配置错误：缺少 WORKER_TOKEN');
+    return;
+  }
+  if (!isWorkerAuthorized(req)) {
+    sendError(res, 401, '未授权：请通过 Worker 访问');
     return;
   }
 

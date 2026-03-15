@@ -1,0 +1,10 @@
+name = "snapkeep-backup-proxy"
+main = "src/index.js"
+compatibility_date = "2026-03-15"
+
+[vars]
+# Node 代理服务的基础地址，必须包含 /api/backup
+# 例如：https://proxy-origin.snapkeep.cn/api/backup
+# UPSTREAM_BASE_URL = "https://proxy-origin.snapkeep.cn/api/backup"
+# Worker -> Node 共享密钥（建议用 wrangler secret put）
+# WORKER_TOKEN = "your-strong-key"

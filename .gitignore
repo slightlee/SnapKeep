@@ -9,6 +9,9 @@ node_modules
 !.codex/skills/git-commit-message/**
 **/__pycache__/
 *.pyc
-backend/.env
+services/backup-proxy/node/.env
+services/backup-proxy/worker/wrangler.toml
+services/backup-proxy/worker/.dev.vars
 frontend/.env
 frontend/dist/**
+services/backup-proxy/worker/.wrangler/**

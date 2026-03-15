@@ -115,7 +115,7 @@ snapkeep/
 │   ├── vite.config.js    # Vite 配置
 │   ├── tailwind.config.js# Tailwind 配置（含 darkMode: 'class'）
 │   └── package.json      # 依赖配置
-├── backend/          # 备份代理服务（待接入）
+├── services/backup-proxy/node/   # 备份代理服务（Node.js）
 ├── doc/              # 文档
 └── CHANGELOG.md
 ```

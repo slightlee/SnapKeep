@@ -35,7 +35,7 @@ pnpm dev
 ### Docker 启动（推荐生产）
 
 ```bash
-cd backend
+cd services/backup-proxy/node
 cp .env.example .env
 # 编辑 .env 后启动
 sudo docker compose up -d --build
@@ -50,7 +50,7 @@ sudo docker compose logs -f --tail=100
 
 ## 环境变量
 
-服务启动时会自动读取 `backend/.env`。建议先复制示例文件：
+服务启动时会自动读取 `services/backup-proxy/node/.env`。建议先复制示例文件：
 
 ```bash
 cp .env.example .env
@@ -65,6 +65,8 @@ cp .env.example .env
 - `NODE_OPTIONS`：Node 启动参数，默认建议 `--max-old-space-size=128`
 - `CONTAINER_MEM_LIMIT`：Docker 容器内存上限（如 `256m`，由 `docker-compose.yml` 读取）
 - `BACKUP_API_KEY`：接口鉴权密钥（公网建议必配）
+- `REQUIRE_WORKER_TOKEN`：是否仅允许来自 Worker 的请求（`1/true` 启用）
+- `WORKER_TOKEN`：Worker 与 Node 之间的共享密钥
 - `ALLOWED_ORIGINS`：允许的前端来源（逗号分隔）
 - `ALLOWED_WEBDAV_HOSTS`：允许连接的 WebDAV 主机（逗号分隔，支持 `*.domain`）
 - `JSON_BODY_MAX_BYTES`：JSON 请求体大小上限（字节）
@@ -130,4 +132,4 @@ curl -X POST "http://localhost:3001/api/backup/put" \
 - 建议结合你现有网关或防火墙策略配置 HTTPS、连接数和请求体限制
 - 若前端与代理非同源，请显式配置 `ALLOWED_ORIGINS`
 - 小内存机器建议同时配置：`NODE_OPTIONS=--max-old-space-size=96~128`、`CONTAINER_MEM_LIMIT=192m~256m`
-- 部署文档（Docker-only）：[deploy/README.md](/Users/ming/ai-project/SnapKeep/backend/deploy/README.md)
+- 部署文档（Docker-only）：[deploy/README.md](./deploy/README.md)

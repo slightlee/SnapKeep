@@ -34,8 +34,8 @@ cd frontend && pnpm install && pnpm dev
 需要联调 WebDAV 备份功能：
 
 ```bash
-# backend
-cd backend && pnpm install && pnpm dev
+# backup-proxy (node)
+cd services/backup-proxy/node && pnpm install && pnpm dev
 
 # frontend
 cd frontend && pnpm install && pnpm dev
@@ -48,7 +48,8 @@ cd frontend && pnpm install && pnpm dev
 ## 仓库结构
 
 - `frontend/`：前端单页应用，负责本地记录管理与 WebDAV 备份入口
-- `backend/`：WebDAV 备份代理服务，负责同源代理、鉴权与安全防护
+- `services/backup-proxy/node/`：WebDAV 备份代理服务（Node.js）
+- `services/backup-proxy/worker/`：备份代理入口（Cloudflare Worker 反向代理）
 - `doc/`：版本、发布、提交流程等项目文档
 - `.codex/skills/`：项目内 AI 协作技能
 
@@ -56,8 +57,9 @@ cd frontend && pnpm install && pnpm dev
 
 使用与部署
 - 前端说明：[frontend/README.md](./frontend/README.md)
-- 后端说明：[backend/README.md](./backend/README.md)
-- 后端部署：[backend/deploy/README.md](./backend/deploy/README.md)
+- 后端说明：[services/backup-proxy/node/README.md](./services/backup-proxy/node/README.md)
+- 后端部署：[services/backup-proxy/node/deploy/README.md](./services/backup-proxy/node/deploy/README.md)
+- Worker 说明：[services/backup-proxy/worker/README.md](./services/backup-proxy/worker/README.md)
 
 工程规范
 - Git 提交规范：[doc/Git提交规范.md](./doc/Git提交规范.md)

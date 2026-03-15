@@ -11,7 +11,7 @@ set -euo pipefail
 REMOTE_USER="${REMOTE_USER:-root}"
 REMOTE_HOST="${REMOTE_HOST:-${1:-}}"
 PEM_KEY_PATH="${PEM_KEY_PATH:-$HOME/local/ssh/bj-47.pem}"
-REMOTE_DIR="${REMOTE_DIR:-/opt/snapkeep/backend}"
+REMOTE_DIR="${REMOTE_DIR:-/opt/snapkeep/backup-proxy}"
 SSH_PORT="${SSH_PORT:-22}"
 IMAGE_NAME="${IMAGE_NAME:-snapkeep-backup-proxy}"
 TAG="${TAG:-${IMAGE_TAG:-}}"

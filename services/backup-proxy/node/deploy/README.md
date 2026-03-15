@@ -13,11 +13,11 @@
 在本地仓库执行：
 
 ```bash
-cd backend/deploy
+cd services/backup-proxy/node/deploy
 REMOTE_HOST=<服务器IP或域名> \
 REMOTE_USER=root \
 PEM_KEY_PATH="$HOME/.ssh/your-key.pem" \
-REMOTE_DIR=/opt/snapkeep/backend \
+REMOTE_DIR=/opt/snapkeep/backup-proxy \
 ./remote-deploy.sh
 ```
 
@@ -52,6 +52,11 @@ REMOTE_DIR=/opt/snapkeep/backend \
 - `NODE_OPTIONS=--max-old-space-size=128`
 - `CONTAINER_MEM_LIMIT=256m`
 - `PUBLIC_PORT=43001`
+
+可选安全配置（仅允许 Worker 访问）：
+
+- `REQUIRE_WORKER_TOKEN=1`
+- `WORKER_TOKEN=<与 Worker 保持一致>`
 
 内存调优建议（1C1G 服务器）：
 
@@ -95,7 +100,7 @@ curl -X POST "https://api.example.com/api/backup/list" \
 ## 常用运维命令
 
 ```bash
-cd /opt/snapkeep/backend
+cd /opt/snapkeep/backup-proxy
 sudo docker compose ps
 sudo docker compose logs -f
 sudo docker compose restart
