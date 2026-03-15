@@ -22,7 +22,6 @@ export const useWebdavBackup = ({
 }) => {
   const WEBDAV_PROVIDERS = [
     { key: 'jianguoyun', label: '坚果云', address: 'https://dav.jianguoyun.com/dav/' },
-    { key: 'aliyun', label: '阿里云盘', address: 'https://dav.aliyundrive.com/' },
     { key: 'custom', label: '自建 / 自定义', address: '' }
   ];
 
